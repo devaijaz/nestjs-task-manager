@@ -11,11 +11,13 @@ import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { SignupSuccessDTO } from './dto/signup-success-dto';
-
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './../types';
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
   async createUser(signupDto: SignupDto) {
     const { email, fullname, password } = signupDto;
@@ -39,15 +41,17 @@ export class AuthService {
     }
   }
 
-  async authenticate({ email, password }: LoginDto) {
+  async authenticate({
+    email,
+    password,
+  }: LoginDto): Promise<{ access_token: string }> {
     const user = await this.userRepository.findOne({
       where: { email },
     });
     if (!(user && (await bcrypt.compare(password, user.password)))) {
       throw new BadRequestException('Invalid username/password');
     }
-    return {
-      message: 'Login Success',
-    };
+    const payload: JwtPayload = { email };
+    return { access_token: this.jwtService.sign(payload) };
   }
 }

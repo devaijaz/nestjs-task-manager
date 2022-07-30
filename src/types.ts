@@ -3,3 +3,7 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   MODERATOR = 'MODERATOR',
 }
+
+export interface JwtPayload {
+  email: string;
+}
