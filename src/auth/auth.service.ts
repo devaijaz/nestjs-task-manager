@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -17,8 +18,8 @@ export class AuthService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
   async createUser(signupDto: SignupDto) {
+    const { email, fullname, password } = signupDto;
     try {
-      const { email, fullname, password } = signupDto;
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(password, salt);
       const user = this.userRepository.create({
@@ -28,8 +29,12 @@ export class AuthService {
       });
       const userCreated = await this.userRepository.save(user);
       return SignupSuccessDTO.convert(userCreated);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      if (error.code == '23505') {
+        throw new ConflictException(
+          `Email "${email}" already in use, try another.`,
+        );
+      }
       throw new InternalServerErrorException();
     }
   }
