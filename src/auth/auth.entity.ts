@@ -5,6 +5,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { UserRole } from '../types';
 
 @Entity({ name: 'users' })
 export class User {
@@ -28,4 +29,7 @@ export class User {
 
   @UpdateDateColumn()
   updatedOn: Date;
+
+  @Column({ default: UserRole.USER })
+  role: UserRole;
 }
