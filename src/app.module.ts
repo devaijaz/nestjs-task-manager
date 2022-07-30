@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSourceOptions } from 'typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -10,16 +10,23 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => {
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (
+        config: ConfigService,
+      ): Promise<TypeOrmModuleOptions> => {
+        const isProduction = config.get('STAGE') === 'prod';
         return {
-          type: process.env.DATABASE_TYPE as DataSourceOptions['type'],
-          url: process.env.DATABASE_CONNECTION_URL,
+          type: config.get('DATABASE_TYPE'),
+          url: config.get('DATABASE_CONNECTION_URL'),
           autoLoadEntities: true,
-          synchronize: true,
-        };
+          synchronize: !isProduction,
+          ssl: isProduction,
+        } as TypeOrmModuleOptions;
       },
     }),
     AuthModule,
+    TasksModule,
   ],
   controllers: [],
   providers: [],
