@@ -17,6 +17,7 @@ import { Request, Response } from 'express';
 import { JwtPayload } from '../types';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './auth.entity';
+import { GetUser } from 'src/decorators/get-user';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -60,7 +61,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard())
   @Get('/me')
-  profile(@Req() req) {
-    return new User({ ...req.user });
+  profile(@GetUser() user: User) {
+    return new User({ ...user });
   }
 }
