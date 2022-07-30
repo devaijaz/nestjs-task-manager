@@ -6,4 +6,5 @@ export enum UserRole {
 
 export interface JwtPayload {
   email: string;
+  fullname?: string;
 }

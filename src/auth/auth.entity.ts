@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -9,6 +10,10 @@ import { UserRole } from '../types';
 
 @Entity({ name: 'users' })
 export class User {
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryColumn({ generated: 'uuid' })
   id: string;
 
@@ -22,14 +27,18 @@ export class User {
   fullname: string;
 
   @Column({ default: true })
+  @Exclude()
   active: boolean;
 
   @CreateDateColumn()
+  @Exclude()
   createdOn: Date;
 
   @UpdateDateColumn()
+  @Exclude()
   updatedOn: Date;
 
   @Column({ default: UserRole.USER })
+  @Exclude()
   role: UserRole;
 }
