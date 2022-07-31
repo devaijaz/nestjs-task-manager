@@ -2,12 +2,15 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { EnvSchemaValidation } from './env.schema.validation';
 import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validationSchema: EnvSchemaValidation,
+      envFilePath: `.env.${process.env.STAGE}`,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
