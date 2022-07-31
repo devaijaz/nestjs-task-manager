@@ -1,9 +1,11 @@
 import { Exclude } from 'class-transformer';
+import { Tasks } from 'src/tasks/tasks.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  PrimaryColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../types';
@@ -14,7 +16,7 @@ export class User {
     Object.assign(this, partial);
   }
 
-  @PrimaryColumn({ generated: 'uuid' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true })
@@ -41,4 +43,7 @@ export class User {
   @Column({ default: UserRole.USER })
   @Exclude()
   role: UserRole;
+
+  @OneToMany(() => Tasks, (task) => task.user)
+  tasks: Tasks[];
 }
