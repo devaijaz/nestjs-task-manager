@@ -1,6 +1,7 @@
 import * as Joi from 'joi';
 
 export const EnvSchemaValidation = Joi.object({
+  STAGE: Joi.string().valid('dev', 'prod').required(),
   JWT_SECRET: Joi.string().required(),
   REFRESH_TOKEN_SECRET: Joi.string().required(),
   DATABASE_TYPE: Joi.string().required(),

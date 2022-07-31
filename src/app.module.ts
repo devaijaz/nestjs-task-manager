@@ -1,8 +1,11 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { EnvSchemaValidation } from './env.schema.validation';
+import { HttpLogMiddleware } from './middlewares/HttpLogMiddleware';
+import { TasksController } from './tasks/tasks.controller';
 import { TasksModule } from './tasks/tasks.module';
 
 @Module({
@@ -34,4 +37,10 @@ import { TasksModule } from './tasks/tasks.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(HttpLogMiddleware)
+      .forRoutes(AuthController, TasksController);
+  }
+}
